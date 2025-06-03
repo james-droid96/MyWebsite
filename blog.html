@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Blog - James Po</title>
+  </title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #f8f8f8;
+      color:#333;
+      transition: all 0.3s ease;
+    }
+
+    body.expanded-view {
+      overflow: hidden;
+    }
+
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1001;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    .btn.home-btn {
+      color: white;
+      text-decoration: none;
+      font-size: 1.2rem;
+    }
+
+    .blog-container {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+      position: relative;
+    }
+
+    .blog-container h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: bold;
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .blog-card {
+      position: relative;
+      transition: all 0.1s ease;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .blog-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .blog-card.expanded {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 1000px;
+      max-height: 90vh;
+      z-index: 1002;
+      overflow-y: auto;
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    }
+
+    .blog-card img.cover {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .blog-content {
+      padding: 1rem;
+    }
+
+    .blog-content h2 {
+      margin-bottom: 0.5rem;
+    }
+
+    .blog-content p {
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    .read-more {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: #1e88e5;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .read-more:hover {
+      background: #1565c0;
+    }
+
+    .extra-content {
+      display: none;
+      padding: 1rem;
+      border-top: 1px solid #ddd;
+      background: #fafafa;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .extra-content img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #footer {
+      background-color: #f8f8f8;
+      padding: 20px 0;
+      text-align: center;
+      border-top: 1px solid #ddd;
+      position: relative;
+      margin-top: 40px;
+    }
+
+    .footer-content p {
+      margin: 0;
+      font-family: 'Calibri', sans-serif;
+      font-size: 16px;
+      color: #555;
+    }
+
+    .comments-section {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #ccc;
+    }
+
+    .comments-section h3 {
+      margin-bottom: 1rem;
+    }
+
+    .comments-list {
+      margin-bottom: 1rem;
+    }
+
+    .comment {
+      background: #f1f1f1;
+      padding: 0.7rem;
+      border-radius: 5px;
+      margin-bottom: 0.7rem;
+    }
+
+    .comment strong {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: #1e88e5;
+    }
+
+    .comment-form input,
+    .comment-form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 0.7rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-family: inherit;
+    }
+
+    .comment-form button {
+      padding: 0.5rem 1rem;
+      background: #1e88e5;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .comment-form button:hover {
+      background: #1565c0;
+    }
+
+    .bottom-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 2rem;
+      border-top: 1px solid #ccc;
+      padding-top: 2rem;
+    }
+
+    .comments-section,
+    .social-section {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .social-section h3 {
+      margin-bottom: 1rem;
+    }
+
+    .social-links {
+      list-style: none;
+      padding: 0;
+    }
+
+    .social-links li {
+      margin-bottom: 0.7rem;
+    }
+
+    .social-links a {
+      color: #1e88e5;
+      text-decoration: none;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .social-links a i {
+      margin-right: 8px;
+      font-size: 1.8rem;
+    }
+
+    .social-links a:hover {
+      color: #1565c0;
+    }
+
+    #backToTop {
+      position: fixed;
+      bottom: 60px;
+      right: 30px;
+      z-index: 99;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      outline: none;
+      padding: 10px 15px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      display: none;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    #backToTop:hover {
+      background-color: #1565c0;
+      transform: scale(1.1);
+    }
+
+    /* Overlay for expanded view */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      display: none;
+    }
+
+
+/* Responsive Design */
+
+/* Large desktops (1200px and up) */
+@media (min-width: 1200px) {
+  .blog-container {
+    padding: 2rem 0;
+  }
+}
+
+/* Laptops and small desktops (992px to 1199px) */
+@media (max-width: 1199px) {
+  .blog-container {
+    padding: 1.5rem 1rem;
+  }
+  .blog-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* Tablets (768px to 991px) */
+@media (max-width: 991px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+  .logo {
+    font-size: 1.2rem;
+  }
+  .blog-container {
+    padding: 1rem 0.5rem;
+  }
+  .blog-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .blog-card img.cover {
+    height: 160px;
+  }
+}
+
+/* Phones (up to 767px) */
+@media (max-width: 767px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.7rem 0.5rem;
+  }
+  .logo {
+    font-size: 1rem;
+  }
+  .btn.home-btn {
+    font-size: 1rem;
+  }
+  .blog-container {
+    padding: 0.5rem 0.2rem;
+  }
+  .blog-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+  .blog-card {
+    border-radius: 5px;
+  }
+  .blog-card img.cover {
+    height: 120px;
+  }
+  .blog-content {
+    padding: 0.7rem;
+  }
+  .read-more {
+    font-size: 0.95rem;
+    padding: 0.4rem 0.8rem;
+  }
+  .extra-content {
+    padding: 0.7rem;
+  }
+  #backToTop {
+    bottom: 20px;
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 16px;
+  }
+  .footer-content p {
+    font-size: 14px;
+  }
+}
+
+/* Extra small devices (up to 480px) */
+@media (max-width: 480px) {
+  .blog-card img.cover {
+    height: 90px;
+  }
+  .blog-content h2 {
+    font-size: 1.1rem;
+  }
+  .blog-content p {
+    font-size: 0.9rem;
+  }
+  .extra-content img {
+    max-height: 180px;
+  }
+}
+    
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">My Blog</div>
+  <a href="index.html" class="btn home-btn"><i class="fa-solid fa-house-user"></i></a>
+</header>
+
+<main class="blog-container">
+  <h1>Welcome to My Blog</h1>
+  <div class="blog-grid">
+
+    <!-- Journey -->
+    <div class="blog-card">
+      <img src="blogimages/Blog_image1.jpg" class="cover" alt="Journey">
+      <div class="blog-content">
+        <h2>My Journey</h2>
+        <p>My first journey as an Information Technology student at STI Alaminos was a thrilling and transformative plunge into the digital world. 
+           Stepping onto the campus, I was immediately struck by the vibrant atmosphere and the promise of a future shaped by technology.
+        </p>
+        <button class="read-more">Read More</button>
+
+        <div class="extra-content">
+            <h3>Learning in JAVA Language</h3>
+          <p>This is my First Task of being aspiring future programmer</p>
+          <img src="blogimages/image1.jpeg" alt="Journey full" />
+          <p>
+            The first few weeks were a mix of excitement and nervousness. I remember sitting in my first class, surrounded by fellow students, all of us eager to learn the basics of programming. The instructors were not just teachers; they were mentors who guided us through the complexities of coding languages and software development. 
+            Each lesson was a step deeper into the world of technology, and I found myself captivated by the endless possibilities that lay ahead.
+          </p>
+            <h3>Learning in C# Language</h3>
+            <img src="blogimages/image3.jpeg" alt="Journey full" />
+            <p>
+                Learning about algorithms, data structures, and the intricacies of software design felt like unlocking a new language.
+                The hands-on projects were particularly exhilarating, allowing us to apply theoretical knowledge in practical scenarios.
+            </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capstone Project -->
+    <div class="blog-card">
+      <img src="blogimages/C_IMG9.jpeg" class="cover" alt="Capstone Project">
+      <div class="blog-content">
+        <h2>Capstone Project</h2>
+        <p>
+            Our capstone project involved the design, development, and implementation of a robust Point of Sale (POS) System. Recognizing the persistent need for efficient and accurate transaction processing in various retail and service-oriented businesses,
+            this system aims to streamline sales operations, enhance inventory management, and provide valuable insights for business owners.
+        </p>
+        <button class="read-more">Read More</button>
+
+        <div class="extra-content">
+          <p>
+            My capstone project was a significant milestone in my academic journey. It involved extensive research and practical application of my skills.
+          </p>
+          <img src="blogimages/C_IMG5.jpeg" alt="Capstone" />
+          <p>
+            The project was a huge success, and I was able to demonstrate my capabilities to my peers and  instructors. 
+            I learned a lot about project management, teamwork, and problem-solving.
+          </p>
+          <img src="blogimages/C_IMG3.jpeg" alt="Capstone" />
+          <p>
+            The project also taught me the importance of adaptability and continuous learning in 
+            the ever-evolving field.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- OJT Card-->
+    <div class="blog-card">
+      <img src="blogimages/Ojt_im1.jpeg" class="cover" alt="Journey">
+      <div class="blog-content">
+        <h2>My OJT Journey</h2>
+        <p>
+            My On-the-Job Training (OJT) experience was a pivotal moment in my academic journey. It was a time of immense growth, learning, and real-world application of the skills I had acquired during my studies.
+            I was fortunate to secure an internship at a reputable company, where I was able to immerse myself in the professional environment and gain hands-on experience in my field.
+        </p>
+        <button class="read-more">Read More</button>
+
+        <div class="extra-content">
+            <p>            </p>
+          <img src="blogimages/Ojt_im3.jpeg" alt="Journey full" />
+          <p>
+            The OJT program provided me with a unique opportunity to apply the theoretical knowledge I had gained in the classroom to real-world scenarios.
+            I was involved in various projects that challenged my problem-solving skills and allowed me to collaborate with experienced professionals.
+            This experience not only enhanced my technical skills but also taught me the importance of teamwork, communication, and adaptability in a professional setting.
+          </p>
+            <img src="blogimages/BFP_Certificate.jpeg" alt="Journey full" />
+            <p> On May 14, 2025, I was proud to receive my certificate from the Bureau of Fire Protection (BFP) 
+                mention specific BFP office if applicable, "Alaminos City Fire Station". This certificate signifies my successful completion of mention what the certificate is for Fire Safety Seminar
+                 "Fire Drill Participation," "Fire Volunteer Training," 
+                 "Fire Safety Inspection compliance for a specific property".
+                </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Memories -->
+    <div class="blog-card">
+      <img src="blogimages/Memo_IM1.jpeg" class="cover" alt="Journey">
+      <div class="blog-content">
+        <h2>My Colleagues</h2>
+        <p>
+            My colleagues were an integral part of my journey as an Information Technology student at STI Alaminos. 
+            They were not just classmates; they became friends, mentors, and a support system that made the learning experience more enriching and enjoyable.
+            Together, we navigated the challenges of our coursework, shared knowledge, and celebrated each other's successes.
+        </p>
+        <button class="read-more">Read More</button>
+
+        <div class="extra-content">
+            <p>            </p>
+          <img src="blogimages/MEMO_IM2.jpeg" alt="Journey full" />
+          <p>
+            The camaraderie we built during our time together was invaluable. We spent countless hours studying, collaborating on projects, and helping each other understand complex concepts.
+            The diverse backgrounds and perspectives of my colleagues enriched our discussions and broadened my understanding of the field.
+            I am grateful for the friendships formed and the memories created during this journey.
+          </p>
+            <img src="blogimages/MEMO_IM3.jpeg" alt="Journey full" />
+           <p>
+            Our time together was filled with laughter, inside jokes, and moments of triumph. We celebrated each other's achievements, whether it was acing an exam, completing a challenging project, or simply mastering a difficult concept.
+            These shared experiences created a strong bond that extended beyond the classroom, and I cherish the memories we made together.
+           </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="comments-section">
+      <h3>Comments</h3>
+      <div class="comments-list"></div>
+
+      <form class="comment-form">
+        <input type="text" class="comment-name" placeholder="Your name" required>
+        <textarea class="comment-text" placeholder="Write a comment..." required></textarea>
+        <button type="submit">Post Comment</button>
+      </form>
+    </div>
+    
+    <!-- Social Media Section -->
+    <div class="social-section">
+      <h3>Connect with Me</h3>
+      <ul class="social-links">
+        <li><a href="https://www.facebook.com/james.marcha" target="_blank"><i class="fab fa-facebook"></i> Facebook</a></li>
+        <li><a href="mailto:jamespo1896@gmail.com"><i class="fas fa-envelope"></i> Gmail</a></li>
+        <li><a href="https://www.threads.com/@marcha_james0?xmt=AQGzTAkL1iXJxfWVZrh2dVG-y62Ucw3TGDm3lu58nlfgwrs" target="_blank"><i class="fab fa-instagram"></i> Instagram</a></li>
+        <li><a href="https://www.linkedin.com/in/james-po-a47961285" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+        <a href="https://github.com/james-droid96"><i class="fa-brands fa-github"></i>GitHub</a>
+      </ul>
+    </div>
+    
+    <!-- Back to Top Button -->
+    <button id="backToTop" title="Back to Top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+  </div>
+</main>
+
+<!-- Overlay for expanded view -->
+<div class="overlay"></div>
+
+<footer id="footer">
+    <div class="footer-content"><br>
+        <p>&copy; 2025 James Po. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Create close button for expanded view
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-expanded';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.style.display = 'none';
+    document.body.appendChild(closeBtn);
+    
+    const overlay = document.querySelector('.overlay');
+    const blogCards = document.querySelectorAll('.blog-card');
+    const blogGrid = document.querySelector('.blog-grid');
+    const body = document.body;
+    
+    // Handle read more clicks
+    document.querySelectorAll('.read-more').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const blogCard = this.closest('.blog-card');
+        const extraContent = this.nextElementSibling;
+        
+        // Expand the clicked card
+        blogCard.classList.add('expanded');
+        extraContent.style.display = 'block';
+        overlay.style.display = 'block';
+        body.classList.add('expanded-view');
+        
+        // Hide other cards
+        blogCards.forEach(card => {
+          if (card !== blogCard) {
+            card.style.opacity = '0';
+            card.style.visibility = 'hidden';
+          }
+        });
+        
+        // Show close button
+        closeBtn.style.display = 'flex';
+        
+        // Scroll to top of expanded content
+        blogCard.scrollTo(0, 0);
+      });
+    });
+    
+    // Close expanded view
+    function closeExpandedView() {
+      const expandedCard = document.querySelector('.blog-card.expanded');
+      if (expandedCard) {
+        expandedCard.classList.remove('expanded');
+        overlay.style.display = 'none';
+        body.classList.remove('expanded-view');
+        closeBtn.style.display = 'none';
+        
+        // Show all cards again
+        blogCards.forEach(card => {
+          card.style.opacity = '1';
+          card.style.visibility = 'visible';
+        });
+        
+        // Hide extra content
+        const extraContent = expandedCard.querySelector('.extra-content');
+        if (extraContent) {
+          extraContent.style.display = 'none';
+        }
+      }
+    }
+    
+    // Close button click
+    closeBtn.addEventListener('click', closeExpandedView);
+    
+    // Overlay click
+    overlay.addEventListener('click', closeExpandedView);
+    
+    // Escape key to close
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeExpandedView();
+      }
+    });
+    
+    // Original functionality for other elements
+    document.querySelector('.home-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.open('index.html', '_self');
+      window.close(); 
+    });
+    
+    document.querySelectorAll('.comment-form').forEach(form => {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+    
+        const name = form.querySelector('.comment-name').value.trim();
+        const text = form.querySelector('.comment-text').value.trim();
+        const list = form.closest('.comments-section').querySelector('.comments-list');
+    
+        if (name && text) {
+          const commentEl = document.createElement('div');
+          commentEl.className = 'comment';
+          commentEl.innerHTML = `<strong>${name}</strong><p>${text}</p>`;
+          list.appendChild(commentEl);
+    
+          // Clear inputs
+          form.querySelector('.comment-name').value = '';
+          form.querySelector('.comment-text').value = '';
+        }
+      });
+    });
+    
+    // Back to Top functionality
+    const backToTopBtn = document.getElementById("backToTop");
+    
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 300) {
+        backToTopBtn.style.display = "block";
+      } else {
+        backToTopBtn.style.display = "none";
+      }
+    });
+    
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+ 
+let isLoading = false;
+let currentPage = 1;
+const blogGrid = document.querySelector('.blog-grid');
+
+// Function to load more content
+async function loadMoreContent() {
+  if (isLoading) return;
+  
+  isLoading = true;
+  
+  // Show loading indicator
+  const loader = document.createElement('div');
+  loader.className = 'loading-indicator';
+  loader.textContent = 'Loading...';
+  blogGrid.appendChild(loader);
+  
+  try {
+    // Simulate API call (replace with your actual data fetching)
+    const response = await fetch(`/api/posts?page=${currentPage}`);
+    const newPosts = await response.json();
+    
+    if (newPosts.length > 0) {
+      // Remove loading indicator
+      blogGrid.removeChild(loader);
+      
+      // Add new posts to the grid
+      newPosts.forEach(post => {
+        const postHTML = `
+          <div class="blog-card">
+            <img src="${post.image}" class="cover" alt="${post.title}">
+            <div class="blog-content">
+              <h2>${post.title}</h2>
+              <p>${post.excerpt}</p>
+              <button class="read-more">Read More</button>
+              <div class="extra-content" style="display:none;">
+                ${post.fullContent}
+              </div>
+            </div>
+          </div>
+        `;
+        blogGrid.insertAdjacentHTML('beforeend', postHTML);
+      });
+      
+      // Reattach event listeners to new read-more buttons
+      attachReadMoreListeners();
+      
+      currentPage++;
+    } else {
+      // No more posts to load
+      blogGrid.removeChild(loader);
+      window.removeEventListener('scroll', handleScroll);
+    }
+  } catch (error) {
+    console.error('Error loading more content:', error);
+    blogGrid.removeChild(loader);
+  }
+  
+  isLoading = false;
+}
+
+// Scroll event handler
+function handleScroll() {
+  const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+  if (scrollTop + clientHeight >= scrollHeight - 100) {
+    loadMoreContent();
+  }
+}
+
+// Attach event listeners to read-more buttons
+function attachReadMoreListeners() {
+  document.querySelectorAll('.read-more').forEach(btn => {
+    if (!btn.hasAttribute('data-listener-attached')) {
+      btn.setAttribute('data-listener-attached', 'true');
+      btn.addEventListener('click', function() {
+        const blogCard = this.closest('.blog-card');
+        const extraContent = this.nextElementSibling;
+        
+        blogCard.classList.add('expanded');
+        extraContent.style.display = 'block';
+        overlay.style.display = 'block';
+        body.classList.add('expanded-view');
+        
+        document.querySelectorAll('.blog-card').forEach(card => {
+          if (card !== blogCard) {
+            card.style.opacity = '0';
+            card.style.visibility = 'hidden';
+          }
+        });
+        
+        closeBtn.style.display = 'flex';
+        blogCard.scrollTo(0, 0);
+      });
+    }
+  });
+}
+
+// Initialize
+window.addEventListener('scroll', handleScroll);
+
+// Add this CSS for the loading indicator
+const loadingStyle = document.createElement('style');
+loadingStyle.textContent = `
+  .loading-indicator {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2rem;
+    color: #666;
+  }
+`;
+document.head.appendChild(loadingStyle);
+
+</script>
+
+</body>
+</html>
